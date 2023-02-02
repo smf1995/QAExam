@@ -18,7 +18,7 @@ npm install
 ## Run Tests
 
 ```
-npm run test
+npx cypress run
 ```
 
 ``` 
