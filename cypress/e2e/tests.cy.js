@@ -37,7 +37,7 @@ describe('Hand-picked combinations feature', () => {
   });
 
   it('TestID-003 Hand Picked combination - Cards Information', () => {
-    const city='Madrid';
+    const city='New York';
     homePage.setViewPort(1024,800);
     homePage.search(city,false);
     cityPage.verifyTitlePage(city + ' attractions');
