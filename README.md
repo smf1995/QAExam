@@ -17,12 +17,11 @@ npm install
 
 ## Run Tests
 
-(Only for IDE)
+```
+npm run test
+```
+
 ``` 
 npx cypress open 
 ```
-
-```
-npm run test
-
-```
+(Only for IDE)
