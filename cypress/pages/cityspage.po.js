@@ -53,6 +53,8 @@ class cityPage {
       cy.get("span[class='Price CardPricing__price text-500 block text-red600']"),
     articlePrice: () =>
       cy.get("span[class='Price CardPricing__price text-500 block text-ink500']"),
+    articleLink: () => 
+        cy.get("a[class='stretched-click-overlay text-no-underline reset-outline text-ink500']")
   };
   
   /**
@@ -226,6 +228,7 @@ class cityPage {
                 this.elements.articleNumberOfReview().should("be.visible");
             }
         });
+        this.elements.articleLink().should("be.visible") ;
         this.elements.articlePriceFrom().should("be.visible").and("contain.text","From");
         if ($el.find("span[class*='round-corners-16 text-12']").length) {
             this.elements.articleDiscount().should("be.visible").invoke('text').as('discount');
@@ -239,15 +242,10 @@ class cityPage {
                 });
             });
             this.elements.articlePriceDiscounted().invoke('text').as('price').then(async() => {
-                await cy.get('@price').then(async $price => {
+                  cy.get('@price').then(async $price => {
                     $price=$price.replace(/^\D+|%/g, '');
-                    discountedPrice=await this.verifyPrice(discount,preDiscount);
-                    const margin= parseFloat(preDiscount.replace(/^\D+|%/g, '')*0.005).toFixed(2);
-                    if($price>=(discountedPrice-margin) && $price <= parseFloat(discountedPrice)+parseFloat(margin)){
-                        cy.log("The discount price match ",$price);   
-                    }else{
-                        throw new Error("The price is not correctly discounted");
-                    }
+                    discountedPrice=await this.calculateDiscountPrice(discount,preDiscount);
+                    await this.verificationOfDiscountPriceWithMargin($price,discountedPrice,preDiscount);
                   });
             });
         }else{
@@ -265,10 +263,29 @@ class cityPage {
   * @param {string} preDiscount the value of an article without discount
   * @returns {number} return the actual price with the discount
   */
- async verifyPrice(discount,preDiscount) {
+ async calculateDiscountPrice(discount,preDiscount) {
     discount= 1.00 - discount/100;
     return (preDiscount*discount).toFixed(2);
   }
+  
+  /**
+   * Check if the price is in the intreval of the marin 0.5%
+   * @param {number} price discouted price presented in the site
+   * @param {number} discountedPrice price calculated by tests
+   * @param {number} preDiscount price withou discount
+   */
+  async verificationOfDiscountPriceWithMargin(price,discountedPrice,preDiscount) {
+    const margin= parseFloat(preDiscount.replace(/^\D+|%/g, '')*0.005).toFixed(2);
+    if(price>=(discountedPrice-margin) && price <= parseFloat(discountedPrice)+parseFloat(margin)){
+       cy.log("The discount price match ",price);   
+    }else{
+       throw new Error("The price is not correctly discounted");
+    }
+  }
+
 }
+
+
+
 
 module.exports = new cityPage();
